@@ -1,0 +1,67 @@
+name: CD
+
+on:
+  push:
+    branches: [devel, stage]
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: codebase/rdicidr-0.1.0
+
+jobs:
+  deploy:
+    name: Deploy ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+    concurrency: deploy-${{ github.ref_name }}
+    env:
+      ENV: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: codebase/rdicidr-0.1.0/.nvmrc
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      # Keys of the rdicidr-<env>-deploy IAM user, stored as secrets of the
+      # GitHub Environment (devel/stage), so each environment uses its own user.
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.5
+          terraform_wrapper: false
+
+      - name: Terraform apply
+        working-directory: codebase/rdicidr-0.1.0/terraform
+        run: |
+          terraform init \
+            -backend-config="bucket=state-fullstack" \
+            -backend-config="key=rdicidr/$ENV/terraform.tfstate"
+          terraform apply -auto-approve -var-file="envs/$ENV.tfvars"
+          {
+            echo "BUCKET=$(terraform output -raw bucket)"
+            echo "DISTRIBUTION_ID=$(terraform output -raw distribution_id)"
+            echo "SITE_URL=$(terraform output -raw site_url)"
+          } >> "$GITHUB_ENV"
+
+      - name: Upload build to S3
+        run: aws s3 sync build "s3://$BUCKET" --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
+          echo "Deployed $ENV: $SITE_URL" >> "$GITHUB_STEP_SUMMARY"
