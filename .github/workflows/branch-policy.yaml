@@ -1,0 +1,25 @@
+name: Branch policy
+
+on:
+  pull_request:
+    branches: [devel, stage]
+
+jobs:
+  branch-policy:
+    name: Branch policy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check source branch
+        env:
+          HEAD: ${{ github.head_ref }}
+          BASE: ${{ github.base_ref }}
+        run: |
+          if [ "$BASE" = "stage" ] && [ "$HEAD" != "devel" ]; then
+            echo "::error::Only devel can be merged into stage"
+            exit 1
+          fi
+          if [ "$BASE" = "devel" ] && [[ ! "$HEAD" =~ ^(feature|bugfix)/ ]]; then
+            echo "::error::Only feature/* or bugfix/* branches can be merged into devel"
+            exit 1
+          fi
+          echo "$HEAD -> $BASE is allowed"

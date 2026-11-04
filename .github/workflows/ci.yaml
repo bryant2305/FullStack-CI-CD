@@ -23,7 +23,7 @@ jobs:
         run: npm install
 
       - name: Cache node_modules
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v4
         with:
           path: codebase/rdicidr-0.1.0/node_modules
           key: node-modules-${{ hashFiles('codebase/rdicidr-0.1.0/package-lock.json') }}

@@ -1,6 +1,6 @@
 import IPv4Addr from "./IPv4Addr";
 import "./App.css";
-import {apiUrl} from "./Config";
+import { apiUrl } from "./Config";
 
 function App() {
   return (
