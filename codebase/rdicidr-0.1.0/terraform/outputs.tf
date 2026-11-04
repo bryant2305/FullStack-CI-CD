@@ -1,9 +1,21 @@
-output "alb_dns_name" {
-  value       = aws_lb.app.dns_name
-  description = "DNS name of the load balancer"
+# Read by the CD pipeline (terraform output -raw ...) after apply.
+
+output "site_url" {
+  description = "Public URL of the application."
+  value       = "https://${aws_cloudfront_distribution.site.domain_name}"
 }
 
-output "cluster_name" {
-  value       = aws_ecs_cluster.main.name
-  description = "ECS cluster name"
+output "bucket" {
+  description = "S3 bucket where the build is uploaded."
+  value       = aws_s3_bucket.site.id
+}
+
+output "distribution_id" {
+  description = "Used to invalidate the CloudFront cache after each deploy."
+  value       = aws_cloudfront_distribution.site.id
+}
+
+output "logs_bucket" {
+  description = "Bucket that stores the CloudFront access logs (prefix cloudfront/)."
+  value       = aws_s3_bucket.logs.id
 }
