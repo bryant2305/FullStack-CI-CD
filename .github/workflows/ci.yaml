@@ -5,7 +5,7 @@ on:
 
 defaults:
   run:
-    working-directory: codebase/rdicidr~0.1.0
+    working-directory: codebase/rdicidr-0.1.0
 
 jobs:
   install:
@@ -17,7 +17,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: codebase/rdicidr~0.1.0/.nvmrc
+          node-version-file: codebase/rdicidr-0.1.0/.nvmrc
 
       - name: Install dependencies
         run: npm install
@@ -25,8 +25,8 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache/save@v3
         with:
-          path: codebase/rdicidr~0.1.0/node_modules
-          key: node-modules-${{ hashFiles('codebase/rdicidr~0.1.0/package-lock.json') }}
+          path: codebase/rdicidr-0.1.0/node_modules
+          key: node-modules-${{ hashFiles('codebase/rdicidr-0.1.0/package-lock.json') }}
 
   lint:
     needs: [install]
@@ -38,13 +38,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: codebase/rdicidr~0.1.0/.nvmrc
+          node-version-file: codebase/rdicidr-0.1.0/.nvmrc
 
       - name: Restore node_modules
         uses: actions/cache/restore@v4
         with:
-          path: codebase/rdicidr~0.1.0/node_modules
-          key: node-modules-${{ hashFiles('codebase/rdicidr~0.1.0/package-lock.json') }}
+          path: codebase/rdicidr-0.1.0/node_modules
+          key: node-modules-${{ hashFiles('codebase/rdicidr-0.1.0/package-lock.json') }}
 
       - name: Run linter
         run: npm run lint
@@ -62,13 +62,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: codebase/rdicidr~0.1.0/.nvmrc
+          node-version-file: codebase/rdicidr-0.1.0/.nvmrc
 
       - name: Restore node_modules
         uses: actions/cache/restore@v4
         with:
-          path: codebase/rdicidr~0.1.0/node_modules
-          key: node-modules-${{ hashFiles('codebase/rdicidr~0.1.0/package-lock.json') }}
+          path: codebase/rdicidr-0.1.0/node_modules
+          key: node-modules-${{ hashFiles('codebase/rdicidr-0.1.0/package-lock.json') }}
 
       - name: Run tests
         env:
@@ -85,13 +85,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: codebase/rdicidr~0.1.0/.nvmrc
+          node-version-file: codebase/rdicidr-0.1.0/.nvmrc
 
       - name: Restore node_modules
         uses: actions/cache/restore@v4
         with:
-          path: codebase/rdicidr~0.1.0/node_modules
-          key: node-modules-${{ hashFiles('codebase/rdicidr~0.1.0/package-lock.json') }}
+          path: codebase/rdicidr-0.1.0/node_modules
+          key: node-modules-${{ hashFiles('codebase/rdicidr-0.1.0/package-lock.json') }}
 
       - name: Build project
         run: npm run build
